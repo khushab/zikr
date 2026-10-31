@@ -43,7 +43,9 @@
     -webkit-tap-highlight-color: transparent;
   }
   main { max-width: 480px; margin: 0 auto; padding: 24px 16px 40px; }
-  h1 { font-size: 1.4rem; margin: 0 0 12px; }
+  header { display: flex; justify-content: space-between; align-items: center; min-height: 40px; margin-bottom: 12px; }
+  h1 { font-size: 1.4rem; margin: 0; }
+  #toToday { border: 0; border-radius: 10px; padding: 8px 14px; background: var(--card); color: var(--accent); font-weight: 600; }
   h2 { font-size: 1.15rem; margin: 32px 0 12px; }
   button { font: inherit; color: inherit; cursor: pointer; }
 
@@ -103,7 +105,10 @@
 </head>
 <body>
 <main>
-  <h1>Daily Zikr</h1>
+  <header>
+    <h1>Daily Zikr</h1>
+    <button id="toToday" hidden>Today</button>
+  </header>
   <div class="nav">
     <button id="dayPrev" aria-label="Previous day">‹</button>
     <span id="dayLabel"></span>
@@ -243,6 +248,8 @@
       ? `${fmt(start, { day: 'numeric', month: 'short' })} – ${fmt(end, { day: 'numeric', month: 'short' })}`
       : fmt(start, { month: 'long', year: 'numeric' });
     $('histNext').disabled = end >= now;
+    // Only offer "Today" when the check-in or the history has moved away from it
+    $('toToday').hidden = +day === +now && end >= now;
     $('hist').innerHTML = ZIKR.map((z) => `
       <tr>
         <td>${z.name}</td>
@@ -253,6 +260,7 @@
 
   $('dayPrev').onclick = () => { day = addDays(day, -1); render(); };
   $('dayNext').onclick = () => { day = addDays(day, 1); render(); };
+  $('toToday').onclick = () => { day = anchor = today(); render(); };
   $('histPrev').onclick = () => { anchor = addDays(period()[0], -1); renderHistory(); };
   $('histNext').onclick = () => { anchor = addDays(period()[1], 1); renderHistory(); };
   // Tapping a calendar day opens it in the check-in at the top
