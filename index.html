@@ -31,7 +31,7 @@
       --muted: #95a09a;
       --accent: #4cc38a;
       --on-accent: #0a1a12;
-      --track: #29312d;
+      --track: #2a322e;
     }
   }
   * { box-sizing: border-box; }
@@ -43,45 +43,74 @@
     -webkit-tap-highlight-color: transparent;
   }
   main { max-width: 480px; margin: 0 auto; padding: 24px 16px 40px; }
-  header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
-  h1 { font-size: 1.4rem; margin: 0; }
-  #date { color: var(--muted); font-size: .9rem; }
+  h1 { font-size: 1.4rem; margin: 0 0 12px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 12px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
 
-  .card { background: var(--card); border-radius: 16px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  .top { display: flex; justify-content: space-between; align-items: center; }
-  .name { font-weight: 600; font-size: 1.05rem; }
-  .card.done .name::after { content: " ✓"; color: var(--accent); }
-  .minus {
-    border: 0; background: none; color: var(--muted);
-    font: inherit; font-size: .9rem; padding: 6px 8px; cursor: pointer;
+  .nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .nav span { font-weight: 600; }
+  .nav button {
+    width: 40px; height: 40px; border: 0; border-radius: 10px;
+    background: var(--card); font-size: 1.4rem; line-height: 1;
+  }
+  .nav button:disabled { opacity: .3; cursor: default; }
+
+  .card { background: var(--card); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .row { display: flex; align-items: center; gap: 12px; }
+  .tick {
+    flex: none; width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid var(--track); background: none; color: transparent;
+    font-size: 1.3rem; font-weight: 700;
+  }
+  .card.partial .tick { border-color: var(--accent); }
+  .card.done .tick { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .name { flex: 1; font-weight: 600; font-size: 1.05rem; }
+  .amount { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+  .amount input {
+    width: 4.6em; padding: 6px 8px; text-align: right;
+    border: 1px solid var(--track); border-radius: 8px;
+    background: none; color: var(--text); font: inherit; font-size: 16px;
   }
   .arabic {
     font-family: Amiri, serif; direction: rtl; text-align: right;
-    font-size: 1.3rem; line-height: 1.9; color: var(--muted); margin: 4px 0 12px;
+    font-size: 1.15rem; line-height: 1.8; color: var(--muted); margin: 8px 0 0;
   }
-  .tap {
-    width: 100%; border: 0; border-radius: 12px; padding: 18px;
-    background: var(--accent); color: var(--on-accent);
-    font: inherit; font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums;
-    cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none;
-  }
-  .tap small { font-size: 1rem; font-weight: 500; opacity: .8; }
-  .tap:active { transform: scale(.98); }
-  .card.done .tap { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
-  .bar { height: 6px; background: var(--track); border-radius: 3px; overflow: hidden; margin-top: 12px; }
-  .bar div { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
 
-  footer { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 20px; line-height: 1.5; }
+  .seg { display: flex; background: var(--track); border-radius: 10px; padding: 3px; margin-bottom: 12px; }
+  .seg button { flex: 1; border: 0; background: none; padding: 8px; border-radius: 8px; color: var(--muted); }
+  .seg button.on { background: var(--card); color: var(--text); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 8px 0; }
+  tr + tr td { border-top: 1px solid var(--track); }
+  td.num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  td.days { text-align: right; color: var(--muted); font-size: .9rem; width: 7.5em; }
+
+  footer { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 24px; line-height: 1.5; }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <h1>Daily Zikr</h1>
-    <span id="date"></span>
-  </header>
+  <h1>Daily Zikr</h1>
+  <div class="nav">
+    <button id="dayPrev" aria-label="Previous day">‹</button>
+    <span id="dayLabel"></span>
+    <button id="dayNext" aria-label="Next day">›</button>
+  </div>
   <div id="list"></div>
-  <footer>Tap the button to count. Saved on this device only.<br>Counts start fresh every day at midnight.<br>Tip: use “Add to Home Screen” to open it like an app.</footer>
+
+  <h2>History</h2>
+  <div class="seg">
+    <button data-mode="week" class="on">Week</button>
+    <button data-mode="month">Month</button>
+  </div>
+  <div class="nav">
+    <button id="histPrev" aria-label="Previous">‹</button>
+    <span id="histLabel"></span>
+    <button id="histNext" aria-label="Next">›</button>
+  </div>
+  <div class="card"><table id="hist"></table></div>
+
+  <footer>Tick what you completed, or type the number if you did a different amount.<br>Saved on this device only.<br>Tip: use “Add to Home Screen” to open it like an app.</footer>
 </main>
 
 <script>
@@ -92,59 +121,128 @@
   ];
   const KEY = 'zikr-counts';
 
-  // Local date (not UTC), so the day rolls over at the user's own midnight
-  function today() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
+  // Dates are local (not UTC), so a day runs from the user's own midnight to midnight
+  const pad = (n) => String(n).padStart(2, '0');
+  const key = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const today = () => addDays(new Date(), 0);
+  const fmt = (d, opts) => d.toLocaleDateString(undefined, opts);
 
-  // Stored as { "2026-10-31": { istighfar: 120, tahleel: 40, durood: 75 }, ... }
+  // Stored as { "2026-10-31": { istighfar: 2000, tahleel: 100, durood: 150 }, ... }
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; }
   }
 
-  function change(id, delta) {
+  function setCount(date, id, n) {
     const data = load();
-    const day = data[today()] ||= {};
-    day[id] = Math.max(0, (day[id] || 0) + delta);
+    const day = data[key(date)] ||= {};
+    if (n > 0) day[id] = n; else delete day[id];
+    if (!Object.keys(day).length) delete data[key(date)];
     localStorage.setItem(KEY, JSON.stringify(data));
-    render();
   }
 
-  const list = document.getElementById('list');
+  let day = today();                   // the day being filled in
+  let mode = 'week', anchor = today(); // the history period on show
+  let shownToday;
+
+  const $ = (id) => document.getElementById(id);
   for (const z of ZIKR) {
-    list.insertAdjacentHTML('beforeend', `
+    $('list').insertAdjacentHTML('beforeend', `
       <section class="card" id="${z.id}">
-        <div class="top">
+        <div class="row">
+          <button class="tick" aria-label="${z.name} done">✓</button>
           <span class="name">${z.name}</span>
-          <button class="minus" aria-label="Remove one">−1</button>
+          <label class="amount"><input type="number" inputmode="numeric" min="0" placeholder="0" aria-label="${z.name} count"> / ${z.target}</label>
         </div>
         <p class="arabic">${z.arabic}</p>
-        <button class="tap"></button>
-        <div class="bar"><div></div></div>
       </section>`);
-    const card = document.getElementById(z.id);
-    card.querySelector('.tap').onclick = () => change(z.id, 1);
-    card.querySelector('.minus').onclick = () => change(z.id, -1);
+    const card = $(z.id);
+    const input = card.querySelector('input');
+    card.querySelector('.tick').onclick = () => {
+      const done = (load()[key(day)]?.[z.id] || 0) >= z.target;
+      setCount(day, z.id, done ? 0 : z.target);
+      render();
+    };
+    input.oninput = () => {
+      setCount(day, z.id, Math.max(0, parseInt(input.value) || 0));
+      render(false);
+    };
   }
 
-  function render() {
-    const counts = load()[today()] || {};
-    document.getElementById('date').textContent =
-      new Date().toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+  function render(updateInputs = true) {
+    const now = today();
+    shownToday = key(now);
+    const ago = Math.round((now - day) / 864e5);
+    const date = fmt(day, { weekday: 'short', day: 'numeric', month: 'short' });
+    $('dayLabel').textContent = ago === 0 ? `Today, ${date}` : ago === 1 ? `Yesterday, ${date}` : date;
+    $('dayNext').disabled = ago <= 0;
+
+    const counts = load()[key(day)] || {};
     for (const z of ZIKR) {
       const n = counts[z.id] || 0;
-      const card = document.getElementById(z.id);
+      const card = $(z.id);
       card.classList.toggle('done', n >= z.target);
-      card.querySelector('.tap').innerHTML = `${n} <small>/ ${z.target}</small>`;
-      card.querySelector('.bar div').style.width = Math.min(100, n / z.target * 100) + '%';
+      card.classList.toggle('partial', n > 0 && n < z.target);
+      if (updateInputs) card.querySelector('input').value = n || '';
     }
+    renderHistory();
+  }
+
+  // Weeks run Monday to Sunday
+  function period() {
+    if (mode === 'week') {
+      const start = addDays(anchor, -((anchor.getDay() + 6) % 7));
+      return [start, addDays(start, 6)];
+    }
+    return [new Date(anchor.getFullYear(), anchor.getMonth(), 1), new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0)];
+  }
+
+  function renderHistory() {
+    const data = load();
+    const [start, end] = period();
+    const last = end < today() ? end : today();  // don't count days that haven't happened yet
+    const totals = {}, done = {};
+    let days = 0;
+    for (let d = start; d <= last; d = addDays(d, 1)) {
+      days++;
+      const counts = data[key(d)] || {};
+      for (const z of ZIKR) {
+        const n = counts[z.id] || 0;
+        totals[z.id] = (totals[z.id] || 0) + n;
+        done[z.id] = (done[z.id] || 0) + (n >= z.target ? 1 : 0);
+      }
+    }
+    $('histLabel').textContent = mode === 'week'
+      ? `${fmt(start, { day: 'numeric', month: 'short' })} – ${fmt(end, { day: 'numeric', month: 'short' })}`
+      : fmt(start, { month: 'long', year: 'numeric' });
+    $('histNext').disabled = end >= today();
+    $('hist').innerHTML = ZIKR.map((z) => `
+      <tr>
+        <td>${z.name}</td>
+        <td class="num">${(totals[z.id] || 0).toLocaleString()}</td>
+        <td class="days">${done[z.id] || 0}/${days} days</td>
+      </tr>`).join('');
+  }
+
+  $('dayPrev').onclick = () => { day = addDays(day, -1); render(); };
+  $('dayNext').onclick = () => { day = addDays(day, 1); render(); };
+  $('histPrev').onclick = () => { anchor = addDays(period()[0], -1); renderHistory(); };
+  $('histNext').onclick = () => { anchor = addDays(period()[1], 1); renderHistory(); };
+  for (const b of document.querySelectorAll('.seg button')) {
+    b.onclick = () => {
+      mode = b.dataset.mode;
+      document.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b));
+      renderHistory();
+    };
   }
 
   render();
-  // Pick up a new day if the page was left open overnight, and changes from other tabs
-  document.addEventListener('visibilitychange', render);
-  window.addEventListener('storage', render);
+  // If the page was left open on "today" past midnight, move to the new day
+  document.addEventListener('visibilitychange', () => {
+    if (key(day) === shownToday) day = today();
+    render();
+  });
+  window.addEventListener('storage', () => render());
   // Ask the browser not to evict our storage when the device runs low on space
   navigator.storage?.persist?.();
   // Lets the home-screen app open without internet
