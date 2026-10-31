@@ -85,6 +85,19 @@
   td.num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
   td.days { text-align: right; color: var(--muted); font-size: .9rem; width: 7.5em; }
 
+  .cal, .cal-head { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+  .cal-head { color: var(--muted); font-size: .75rem; margin: 16px 0 6px; }
+  .cal button { border: 0; background: none; border-radius: 8px; padding: 6px 0 5px; font-size: .9rem; font-variant-numeric: tabular-nums; }
+  .cal button.today { box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .cal button.all { background: var(--accent); color: var(--on-accent); }
+  .cal button:disabled { opacity: .35; cursor: default; }
+  .dots { display: flex; justify-content: center; gap: 3px; margin-top: 4px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--track); }
+  .dots i.partial { background: none; box-shadow: inset 0 0 0 1.5px var(--accent); }
+  .dots i.done { background: var(--accent); }
+  .cal button.all .dots i { background: var(--on-accent); }
+  .legend { color: var(--muted); font-size: .75rem; text-align: center; margin: 12px 0 0; line-height: 1.5; }
+
   footer { color: var(--muted); font-size: .8rem; text-align: center; margin-top: 24px; line-height: 1.5; }
 </style>
 </head>
@@ -108,7 +121,12 @@
     <span id="histLabel"></span>
     <button id="histNext" aria-label="Next">›</button>
   </div>
-  <div class="card"><table id="hist"></table></div>
+  <div class="card">
+    <table id="hist"></table>
+    <div class="cal-head"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+    <div class="cal" id="cal"></div>
+    <p class="legend">Dots, left to right: Istighfar, Tahleel, Durood.<br>Green = all three done. Tap a day to see or change it.</p>
+  </div>
 
   <footer>Tick what you completed, or type the number if you did a different amount.<br>Saved on this device only.<br>Tip: use “Add to Home Screen” to open it like an app.</footer>
 </main>
@@ -200,22 +218,31 @@
   function renderHistory() {
     const data = load();
     const [start, end] = period();
-    const last = end < today() ? end : today();  // don't count days that haven't happened yet
+    const now = today();
     const totals = {}, done = {};
     let days = 0;
-    for (let d = start; d <= last; d = addDays(d, 1)) {
-      days++;
+    // Blank cells so the 1st lands under the right weekday
+    const cells = Array((start.getDay() + 6) % 7).fill('<span></span>');
+    for (let d = start; d <= end; d = addDays(d, 1)) {
       const counts = data[key(d)] || {};
+      const future = d > now;  // days that haven't happened yet don't count
+      if (!future) days++;
+      let dots = '', all = true;
       for (const z of ZIKR) {
         const n = counts[z.id] || 0;
         totals[z.id] = (totals[z.id] || 0) + n;
         done[z.id] = (done[z.id] || 0) + (n >= z.target ? 1 : 0);
+        dots += `<i class="${n >= z.target ? 'done' : n > 0 ? 'partial' : ''}"></i>`;
+        all &&= n >= z.target;
       }
+      const cls = [all && 'all', +d === +now && 'today'].filter(Boolean).join(' ');
+      cells.push(`<button data-day="${key(d)}" class="${cls}" ${future ? 'disabled' : ''}>${d.getDate()}<span class="dots">${dots}</span></button>`);
     }
+    $('cal').innerHTML = cells.join('');
     $('histLabel').textContent = mode === 'week'
       ? `${fmt(start, { day: 'numeric', month: 'short' })} – ${fmt(end, { day: 'numeric', month: 'short' })}`
       : fmt(start, { month: 'long', year: 'numeric' });
-    $('histNext').disabled = end >= today();
+    $('histNext').disabled = end >= now;
     $('hist').innerHTML = ZIKR.map((z) => `
       <tr>
         <td>${z.name}</td>
@@ -228,6 +255,15 @@
   $('dayNext').onclick = () => { day = addDays(day, 1); render(); };
   $('histPrev').onclick = () => { anchor = addDays(period()[0], -1); renderHistory(); };
   $('histNext').onclick = () => { anchor = addDays(period()[1], 1); renderHistory(); };
+  // Tapping a calendar day opens it in the check-in at the top
+  $('cal').onclick = (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    const [y, m, d] = b.dataset.day.split('-').map(Number);
+    day = new Date(y, m - 1, d);
+    render();
+    scrollTo({ top: 0, behavior: 'smooth' });
+  };
   for (const b of document.querySelectorAll('.seg button')) {
     b.onclick = () => {
       mode = b.dataset.mode;
