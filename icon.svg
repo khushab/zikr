@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" fill="#1f7a4d"/>
+<g fill="#ffffff">
+<circle cx="215.6" cy="340.9" r="17"/>
+<circle cx="180.2" cy="320.4" r="17"/>
+<circle cx="153.8" cy="289.0" r="17"/>
+<circle cx="139.8" cy="250.5" r="17"/>
+<circle cx="139.8" cy="209.5" r="17"/>
+<circle cx="153.8" cy="171.0" r="17"/>
+<circle cx="180.2" cy="139.6" r="17"/>
+<circle cx="215.6" cy="119.1" r="17"/>
+<circle cx="256.0" cy="112.0" r="17"/>
+<circle cx="296.4" cy="119.1" r="17"/>
+<circle cx="331.8" cy="139.6" r="17"/>
+<circle cx="358.2" cy="171.0" r="17"/>
+<circle cx="372.2" cy="209.5" r="17"/>
+<circle cx="372.2" cy="250.5" r="17"/>
+<circle cx="358.2" cy="289.0" r="17"/>
+<circle cx="331.8" cy="320.4" r="17"/>
+<circle cx="296.4" cy="340.9" r="17"/>
+<ellipse cx="256" cy="354" rx="20" ry="26"/>
+<rect x="251" y="376" width="10" height="44" rx="5"/>
+<circle cx="256" cy="428" r="12"/>
+</g>
+</svg>

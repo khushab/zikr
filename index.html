@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Daily Zikr</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1f7a4d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zikr">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
@@ -75,7 +81,7 @@
     <span id="date"></span>
   </header>
   <div id="list"></div>
-  <footer>Tap the button to count. Saved on this device only.<br>Counts start fresh every day at midnight.</footer>
+  <footer>Tap the button to count. Saved on this device only.<br>Counts start fresh every day at midnight.<br>Tip: use “Add to Home Screen” to open it like an app.</footer>
 </main>
 
 <script>
@@ -141,6 +147,8 @@
   window.addEventListener('storage', render);
   // Ask the browser not to evict our storage when the device runs low on space
   navigator.storage?.persist?.();
+  // Lets the home-screen app open without internet
+  navigator.serviceWorker?.register('sw.js');
 </script>
 </body>
 </html>
